@@ -1,0 +1,3365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IEEE TEMS Bangalore | Engineering Management, Innovation & Leadership</title>
+    <meta name="description"
+        content="IEEE Technology & Engineering Management Society Bangalore Section - Empowering technology leaders across Karnataka's innovation ecosystem.">
+    <meta property="og:title" content="IEEE TEMS Bangalore | Engineering Management, Innovation & Leadership">
+    <meta property="og:image" content="logo.jpeg">
+    <link rel="icon" type="image/x-icon" href="logo.jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <style>
+        /* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+        :root {
+            --bg-primary: #09090f;
+            --bg-secondary: #0f0f1a;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --bg-card-hover: rgba(255, 255, 255, 0.07);
+            --bg-glass: rgba(15, 15, 26, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --accent: #3b82f6;
+            --accent-2: #6366f1;
+            --accent-3: #06b6d4;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --gold: #f59e0b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.12);
+            --font-display: 'Sora', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --nav-h: 72px;
+            --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8faff;
+            --bg-secondary: #eef2ff;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-hover: rgba(255, 255, 255, 0.9);
+            --bg-glass: rgba(248, 250, 255, 0.85);
+            --border: rgba(59, 130, 246, 0.12);
+            --border-hover: rgba(59, 130, 246, 0.25);
+            --accent-glow: rgba(59, 130, 246, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow-md: 0 4px 24px rgba(59, 130, 246, 0.12);
+        }
+
+        /* ============================================================
+   RESET & BASE
+   ============================================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: background var(--transition), color var(--transition);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        img {
+            max-width: 100%;
+            height: auto
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            background: none;
+            font-family: inherit
+        }
+
+        input,
+        textarea {
+            font-family: inherit
+        }
+
+        ul {
+            list-style: none
+        }
+
+        /* ============================================================
+   SCROLLBAR
+   ============================================================ */
+        ::-webkit-scrollbar {
+            width: 4px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary)
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px
+        }
+
+        /* ============================================================
+   SKIP LINK
+   ============================================================ */
+        .skip-link {
+            position: fixed;
+            top: -100px;
+            left: 1rem;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            z-index: 9999;
+            transition: top .2s
+        }
+
+        .skip-link:focus {
+            top: 1rem
+        }
+
+        /* ============================================================
+   TICKER
+   ============================================================ */
+        .ticker-bar {
+            background: linear-gradient(90deg, var(--accent-2), var(--accent));
+            padding: 8px 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 100;
+        }
+
+        .ticker-container {
+            display: flex;
+            align-items: center;
+            gap: 16px
+        }
+
+        .ticker-icon {
+            color: #fff;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: .9
+        }
+
+        .ticker-wrapper {
+            flex: 1;
+            overflow: hidden;
+            mask: linear-gradient(90deg, transparent, black 5%, black 95%, transparent)
+        }
+
+        .ticker-content {
+            display: flex;
+            gap: 48px;
+            width: max-content;
+            animation: ticker 30s linear infinite;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            letter-spacing: .3px;
+        }
+
+        .ticker-content span::before {
+            content: "·";
+            margin-right: 48px;
+            opacity: .5
+        }
+
+        .ticker-content span:first-child::before {
+            display: none
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(0)
+            }
+
+            100% {
+                transform: translateX(-50%)
+            }
+        }
+
+        /* ============================================================
+   NAVBAR
+   ============================================================ */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            height: var(--nav-h);
+            transition: all var(--transition);
+        }
+
+        .site-header.scrolled {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1.5px solid var(--border-hover);
+        }
+
+        .brand-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 15px;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        .brand-name span {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: .5px
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-card)
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+            background: var(--accent-glow)
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-wrap input {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px 8px 36px;
+            font-size: 13px;
+            color: var(--text-primary);
+            width: 200px;
+            transition: all var(--transition);
+            outline: none;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+            width: 240px
+        }
+
+        .search-wrap input::placeholder {
+            color: var(--text-muted)
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 11px;
+            color: var(--text-muted);
+            font-size: 12px;
+            pointer-events: none
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover)
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 16px;
+            height: 16px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 0 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer
+        }
+
+        /* ============================================================
+   HERO SLIDER
+   ============================================================ */
+        .hero-slider {
+            position: relative;
+            height: calc(100vh - var(--nav-h) - 37px);
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100%
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1
+        }
+
+        .slide-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 8s ease;
+        }
+
+        .slide.active .slide-bg {
+            transform: scale(1.04)
+        }
+
+        .slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(9, 9, 15, 0.85) 0%, rgba(15, 15, 26, 0.6) 60%, transparent 100%);
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            width: 100%;
+        }
+
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 99px;
+            margin-bottom: 24px;
+            animation: fadeInUp .7s ease both;
+        }
+
+        .slide-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.12;
+            color: #fff;
+            max-width: 680px;
+            margin-bottom: 20px;
+            animation: fadeInUp .7s .1s ease both;
+        }
+
+        .slide-title .accent {
+            background: linear-gradient(90deg, var(--accent), var(--accent-3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-sub {
+            font-size: 1.1rem;
+            color: rgba(248, 250, 252, 0.75);
+            max-width: 540px;
+            margin-bottom: 36px;
+            line-height: 1.7;
+            animation: fadeInUp .7s .2s ease both;
+        }
+
+        .slide-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeInUp .7s .3s ease both
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            transition: all var(--transition);
+            box-shadow: 0 0 24px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 0 36px rgba(59, 130, 246, 0.5)
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateY(-1px)
+        }
+
+        .slider-nav {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .slider-arrow {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .slider-arrow:hover {
+            background: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .slider-dots {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .slider-dots .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all .3s ease;
+            cursor: pointer;
+        }
+
+        .slider-dots .dot.active {
+            background: #fff;
+            width: 24px
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 32px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+            animation: scrollPulse 1.8s ease infinite;
+        }
+
+        @keyframes scrollPulse {
+
+            0%,
+            100% {
+                opacity: .4
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        /* ============================================================
+   LAYOUT UTILITIES
+   ============================================================ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px
+        }
+
+        .section {
+            padding: 96px 0
+        }
+
+        .section-sm {
+            padding: 64px 0
+        }
+
+        .section-header {
+            margin-bottom: 56px
+        }
+
+        .section-header.center {
+            text-align: center
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .section-title .hl {
+            background: linear-gradient(90deg, var(--accent), var(--accent-3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 540px;
+            line-height: 1.75
+        }
+
+        .section-header.center .section-subtitle {
+            margin: 0 auto
+        }
+
+        .link-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 500;
+            transition: gap var(--transition);
+        }
+
+        .link-text:hover {
+            gap: 10px
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity .6s ease, transform .6s ease
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: none
+        }
+
+        /* ============================================================
+   PAGE SECTIONS / ROUTING
+   ============================================================ */
+        .page-section {
+            display: none
+        }
+
+        .page-section.active-page {
+            display: block
+        }
+
+        /* ============================================================
+   STATS STRIP
+   ============================================================ */
+        .stats-strip {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 40px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border)
+        }
+
+        .stat-block {
+            background: var(--bg-secondary);
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+            transition: background var(--transition);
+        }
+
+        .stat-block:hover {
+            background: var(--bg-card-hover)
+        }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-num .accent {
+            color: var(--accent)
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: .3px
+        }
+
+        /* ============================================================
+   ABOUT HOME SECTION
+   ============================================================ */
+        .about-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center
+        }
+
+        .about-visual {
+            position: relative
+        }
+
+        .about-card-main {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-card-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .about-card-accent {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: var(--radius-xl);
+            opacity: .12;
+        }
+
+        .about-icon-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px
+        }
+
+        .about-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .about-icon.blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent)
+        }
+
+        .about-icon.purple {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent-2)
+        }
+
+        .about-icon.cyan {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-3)
+        }
+
+        .about-card-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px
+        }
+
+        .about-card-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        /* ============================================================
+   CHAIR MESSAGE
+   ============================================================ */
+        .chair-wrap {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 48px;
+            align-items: start;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chair-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        .chair-photo-wrap {
+            width: 140px;
+            flex-shrink: 0;
+        }
+
+        .chair-photo-frame {
+            width: 140px;
+            height: 160px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 2px solid var(--border-hover);
+            background: var(--bg-secondary);
+        }
+
+        .chair-photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .chair-quote-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            opacity: .3;
+            line-height: 1;
+            margin-bottom: 8px
+        }
+
+        .chair-quote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 24px
+        }
+
+        .chair-sig {
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .chair-name {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .chair-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6
+        }
+
+        /* ============================================================
+   EVENT CARDS
+   ============================================================ */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px
+        }
+
+        .event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .event-card:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .event-img {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .event-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 40%, rgba(9, 9, 15, 0.7))
+        }
+
+        .event-cat {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 99px;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .event-body {
+            padding: 20px
+        }
+
+        .event-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px
+        }
+
+        .event-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4
+        }
+
+        .event-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px
+        }
+
+        .event-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .event-loc {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .event-cta {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap var(--transition);
+        }
+
+        .event-cta:hover {
+            gap: 8px
+        }
+
+        /* ============================================================
+   SECTION DIVIDER
+   ============================================================ */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent)
+        }
+
+        /* ============================================================
+   EXECOM GRID
+   ============================================================ */
+        .execom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px
+        }
+
+        .execom-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 20px;
+            text-align: center;
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .execom-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            background: var(--bg-card-hover)
+        }
+
+        .execom-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .execom-card:hover::before {
+            opacity: 1
+        }
+
+        .execom-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .execom-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .execom-avatar i {
+            font-size: 28px;
+            color: var(--text-muted)
+        }
+
+        .execom-name {
+            font-family: var(--font-display);
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px
+        }
+
+        .execom-role {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 4px
+        }
+
+        .execom-org {
+            font-size: 12px;
+            color: var(--text-muted)
+        }
+
+        /* ============================================================
+   BRANCH CARDS
+   ============================================================ */
+        .branches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px
+        }
+
+        .branch-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: all var(--transition);
+        }
+
+        .branch-card:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px)
+        }
+
+        .branch-name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px
+        }
+
+        .branch-loc {
+            font-size: 13px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px
+        }
+
+        .branch-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.65
+        }
+
+        /* ============================================================
+   RESOURCE CARDS
+   ============================================================ */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px
+        }
+
+        .resource-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .resource-card:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px)
+        }
+
+        .resource-cat {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 99px;
+            margin-bottom: 14px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .resource-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            line-height: 1.4
+        }
+
+        .resource-summary {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 16px
+        }
+
+        .resource-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        /* ============================================================
+   FILTERS
+   ============================================================ */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 36px
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover)
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent)
+        }
+
+        /* ============================================================
+   PAGINATION
+   ============================================================ */
+        .pagination {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 40px
+        }
+
+        .pagination button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff
+        }
+
+        .pagination button:hover:not(.active) {
+            border-color: var(--border-hover);
+            color: var(--text-primary)
+        }
+
+        /* ============================================================
+   SEARCH INPUT
+   ============================================================ */
+        .search-input-full {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color var(--transition);
+            margin-bottom: 28px;
+        }
+
+        .search-input-full:focus {
+            border-color: var(--accent)
+        }
+
+        .search-input-full::placeholder {
+            color: var(--text-muted)
+        }
+
+        /* ============================================================
+   PAGE HERO (inner pages)
+   ============================================================ */
+        .page-hero {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 64px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.08), transparent 60%);
+        }
+
+        .page-hero-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .page-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.75rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .page-hero p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            position: relative
+        }
+
+        /* ============================================================
+   ABOUT PAGE
+   ============================================================ */
+        .about-flex {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 56px;
+            align-items: start
+        }
+
+        .about-block {
+            margin-bottom: 56px
+        }
+
+        .about-block:last-child {
+            margin-bottom: 0
+        }
+
+        .about-block h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px
+        }
+
+        .about-block p {
+            color: var(--text-secondary);
+            line-height: 1.85
+        }
+
+        .sidebar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            position: sticky;
+            top: 96px;
+        }
+
+        .sidebar-card h3 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px
+        }
+
+        .focus-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        .focus-list li:last-child {
+            border-bottom: none
+        }
+
+        .focus-list li i {
+            color: var(--accent);
+            font-size: 12px;
+            margin-top: 3px;
+            flex-shrink: 0
+        }
+
+        .full-chair-wrap {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            margin-top: 24px
+        }
+
+        .chair-full-img {
+            width: 140px;
+            height: 160px;
+            flex-shrink: 0;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .chair-full-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .chair-full-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.85
+        }
+
+        /* ============================================================
+   CONTACT PAGE
+   ============================================================ */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px
+        }
+
+        .contact-info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: var(--radius-sm);
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: var(--text-secondary)
+        }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff
+        }
+
+        .contact-form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+        }
+
+        .contact-form-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px
+        }
+
+        .contact-form-card .sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 28px
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px
+        }
+
+        .form-field {
+            margin-bottom: 14px
+        }
+
+        .form-field input,
+        .form-field textarea,
+        .form-row input {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 13px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color var(--transition);
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus,
+        .form-row input:focus {
+            border-color: var(--accent)
+        }
+
+        .form-field input::placeholder,
+        .form-field textarea::placeholder,
+        .form-row input::placeholder {
+            color: var(--text-muted)
+        }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 120px
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all var(--transition);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(59, 130, 246, 0.45)
+        }
+
+        #formStatus {
+            margin-top: 12px;
+            font-size: 13px;
+            text-align: center
+        }
+
+        /* ============================================================
+   FAQ
+   ============================================================ */
+        .faq-section {
+            margin-top: 80px
+        }
+
+        .faq-section h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px
+        }
+
+        .faq-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+
+        .faq-item.open {
+            border-color: var(--accent)
+        }
+
+        .faq-q {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            gap: 16px;
+        }
+
+        .faq-q i {
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: transform .25s ease;
+            flex-shrink: 0
+        }
+
+        .faq-item.open .faq-q i {
+            transform: rotate(180deg);
+            color: var(--accent)
+        }
+
+        .faq-a {
+            display: none;
+            padding: 0 20px 18px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.75;
+        }
+
+        .faq-item.open .faq-a {
+            display: block
+        }
+
+        /* ============================================================
+   MODAL
+   ============================================================ */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease;
+            background: rgba(9, 9, 15, 0.7);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .modal-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(.96);
+            transition: transform .25s ease;
+        }
+
+        .modal.active .modal-box {
+            transform: scale(1)
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover)
+        }
+
+        .modal-cat {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 99px;
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 14px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            line-height: 1.35
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap
+        }
+
+        .modal-meta span {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .modal-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 24px
+        }
+
+        .modal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+
+        .modal-btn:hover {
+            background: #2563eb
+        }
+
+        /* ============================================================
+   TOAST
+   ============================================================ */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 260px;
+            box-shadow: var(--shadow-md);
+            animation: slideToast .3s ease;
+            pointer-events: all;
+        }
+
+        .toast i {
+            font-size: 14px
+        }
+
+        .toast.success {
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444
+        }
+
+        .toast.info {
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent)
+        }
+
+        .toast.warning {
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b
+        }
+
+        @keyframes slideToast {
+            from {
+                opacity: 0;
+                transform: translateX(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        /* ============================================================
+   FOOTER
+   ============================================================ */
+        .site-footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 64px 0 32px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px
+        }
+
+        .footer-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--border)
+        }
+
+        .footer-brand-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-primary)
+        }
+
+        .footer-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.75;
+            margin-bottom: 20px
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 8px
+        }
+
+        .footer-social {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all var(--transition);
+        }
+
+        .footer-social:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff
+        }
+
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 16px
+        }
+
+        .footer-col ul {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .footer-col ul li a {
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: color var(--transition)
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--text-primary)
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-bottom p {
+            font-size: 12px;
+            color: var(--text-muted)
+        }
+
+        .footer-bottom a {
+            color: var(--accent);
+            font-size: 12px;
+            transition: color var(--transition)
+        }
+
+        .footer-bottom a:hover {
+            color: var(--text-primary)
+        }
+
+        /* ============================================================
+   LOADING / EMPTY STATES
+   ============================================================ */
+        .spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .spinner i {
+            animation: spin 1s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .empty i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+            opacity: .4
+        }
+
+        /* ============================================================
+   RESPONSIVE
+   ============================================================ */
+        @media(max-width:1024px) {
+
+            .about-split,
+            .about-flex,
+            .contact-grid {
+                grid-template-columns: 1fr
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .nav-links {
+                display: none
+            }
+
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: var(--nav-h);
+                left: 0;
+                right: 0;
+                background: var(--bg-glass);
+                backdrop-filter: blur(24px);
+                border-bottom: 1px solid var(--border);
+                padding: 20px 24px;
+                gap: 4px;
+                z-index: 150;
+            }
+
+            .menu-toggle {
+                display: flex
+            }
+
+            .chair-wrap {
+                grid-template-columns: 1fr;
+                gap: 24px
+            }
+
+            .chair-photo-wrap {
+                width: 100%;
+                text-align: center
+            }
+
+            .chair-photo-frame {
+                margin: 0 auto
+            }
+
+            .full-chair-wrap {
+                flex-direction: column
+            }
+
+            .search-wrap {
+                display: none
+            }
+        }
+
+        @media(max-width:640px) {
+            .section {
+                padding: 64px 0
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr
+            }
+
+            .form-row {
+                grid-template-columns: 1fr
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr
+            }
+
+            .slide-actions {
+                flex-direction: column;
+                align-items: flex-start
+            }
+
+            .hero-slider {
+                height: calc(100vh - var(--nav-h) - 37px);
+                min-height: 500px
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center
+            }
+
+            .events-grid,
+            .execom-grid,
+            .branches-grid,
+            .resources-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* ============================================================
+   NOISE GRAIN OVERLAY
+   ============================================================ */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9000;
+            opacity: .03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* ============================================================
+   AMBIENT GLOW ORBS
+   ============================================================ */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: -1;
+            opacity: .12;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -200px;
+            left: -100px
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-2);
+            bottom: 10%;
+            right: -100px
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- ====================================================
+     TICKER
+===================================================== -->
+    <div class="ticker-bar">
+        <div class="container ticker-container">
+            <div class="ticker-icon"><i class="fas fa-satellite-dish"></i></div>
+            <div class="ticker-wrapper">
+                <div class="ticker-content" id="tickerContent">
+                    <span>Welcome to IEEE TEMS Bangalore Section</span>
+                    <span>Empowering Technology Leaders Across Karnataka</span>
+                    <span>Join us for upcoming events and workshops</span>
+                    <span>Welcome to IEEE TEMS Bangalore Section</span>
+                    <span>Empowering Technology Leaders Across Karnataka</span>
+                    <span>Join us for upcoming events and workshops</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================
+     HEADER / NAVBAR
+===================================================== -->
+    <header class="site-header" id="siteHeader">
+        <nav class="nav-inner">
+            <a href="#home" class="brand">
+                <img src="logo.jpeg" alt="IEEE TEMS" class="brand-logo"
+                    onerror="this.src='https://via.placeholder.com/42x42/3b82f6/ffffff?text=T'">
+                <div class="brand-name">IEEE TEMS <span>Bangalore Section</span></div>
+            </a>
+
+            <ul class="nav-links" id="mainMenu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#execom" class="nav-link">Execom 2026</a></li>
+                <li><a href="#events" class="nav-link">Events</a></li>
+                <li><a href="#branches" class="nav-link">Branches</a></li>
+                <li><a href="#resources" class="nav-link">Resources</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div class="search-wrap">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="globalSearch" placeholder="Search..." aria-label="Search">
+                </div>
+                <div class="icon-btn" id="notifIcon" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="notifCount" style="display:none">0</span>
+                </div>
+                <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-sun" id="themeIcon"></i>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ====================================================
+     MAIN
+===================================================== -->
+    <main id="main-content">
+
+        <!-- ==================== HOME ==================== -->
+        <div id="page-home" class="page-section active-page">
+
+            <!-- Hero Slider -->
+            <div class="hero-slider">
+                <div class="slides-container" id="heroSlidesContainer">
+                    <div class="spinner"><i class="fas fa-spinner"></i> Loading...</div>
+                </div>
+                <div class="slider-nav">
+                    <button class="slider-arrow" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
+                    <div class="slider-dots" id="sliderDots"></div>
+                    <button class="slider-arrow" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="scroll-indicator">
+                    <div class="scroll-line"></div>
+                    <span>Scroll</span>
+                </div>
+            </div>
+
+            <!-- Stats Strip -->
+            <div class="stats-strip">
+                <div class="container">
+                    <div class="stats-grid">
+                        <div class="stat-block fade-in-up">
+                            <div class="stat-num"><span class="count accent" id="membersCount">0</span><span
+                                    class="accent">+</span></div>
+                            <div class="stat-label">Active Members</div>
+                        </div>
+                        <div class="stat-block fade-in-up">
+                            <div class="stat-num"><span class="count accent" id="branchesCount">0</span></div>
+                            <div class="stat-label">Student Branches</div>
+                        </div>
+                        <div class="stat-block fade-in-up">
+                            <div class="stat-num"><span class="count accent" id="eventsCount">0</span><span
+                                    class="accent">+</span></div>
+                            <div class="stat-label">Events Per Year</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Preview -->
+            <section class="section">
+                <div class="container">
+                    <div class="about-split">
+                        <div class="fade-in-up">
+                            <span class="section-tag">Who We Are</span>
+                            <h2 class="section-title">Engineering leadership <span class="hl">starts here</span></h2>
+                            <p class="section-subtitle" id="homeIntroText">IEEE Technology & Engineering Management
+                                Society Bangalore Section — nurturing a thriving ecosystem of innovators, educators, and
+                                industry leaders across India's technology capital.</p>
+                            <br><br>
+                            <a href="#about" class="link-text">Discover Our Mission <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                        <div class="about-visual fade-in-up">
+                            <div class="about-card-main">
+                                <div class="about-card-accent"></div>
+                                <div class="about-icon-row">
+                                    <div class="about-icon blue"><i class="fas fa-microchip"></i></div>
+                                    <div class="about-icon purple"><i class="fas fa-chart-line"></i></div>
+                                    <div class="about-icon cyan"><i class="fas fa-users"></i></div>
+                                </div>
+                                <div class="about-card-label">Our Reach</div>
+                                <div class="about-card-value">Karnataka-wide Network</div>
+                                <br>
+                                <div class="about-card-label">Focus Areas</div>
+                                <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-top:4px"
+                                    id="focusSummary">Engineering Management · Innovation Strategy · Entrepreneurship
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="divider"></div>
+
+            <!-- Chair Message -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-header center fade-in-up">
+                        <span class="section-tag">Leadership</span>
+                        <h2 class="section-title">Message from the <span class="hl">Chair</span></h2>
+                    </div>
+                    <div id="chairMessageCard" class="fade-in-up">
+                        <div class="spinner"><i class="fas fa-spinner"></i> Loading message...</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="divider"></div>
+
+            <!-- Upcoming Events Preview -->
+            <section class="section">
+                <div class="container">
+                    <div class="section-header"
+                        style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+                        <div>
+                            <span class="section-tag">What's On</span>
+                            <h2 class="section-title" style="margin-bottom:0">Upcoming Events</h2>
+                        </div>
+                        <a href="#events" class="link-text">View All Events <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="events-grid" id="previewEvents">
+                        <div class="spinner"><i class="fas fa-spinner"></i> Loading events...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== ABOUT ==================== -->
+        <div id="page-about" class="page-section">
+            <div class="page-hero">
+                <div class="container">
+                    <span class="page-hero-tag">About Us</span>
+                    <h1>IEEE TEMS Bangalore</h1>
+                    <p>Driving innovation, technology management, and engineering leadership since our founding in
+                        Bangalore.</p>
+                </div>
+            </div>
+            <section class="section">
+                <div class="container">
+                    <div class="about-flex">
+                        <div id="aboutMainContent">
+                            <div class="spinner"><i class="fas fa-spinner"></i> Loading content...</div>
+                        </div>
+                        <div>
+                            <div class="sidebar-card" id="focusAreasCard">
+                                <div class="spinner"><i class="fas fa-spinner"></i> Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== EXECOM ==================== -->
+        <div id="page-execom" class="page-section">
+            <div class="page-hero">
+                <div class="container">
+                    <span class="page-hero-tag">Leadership</span>
+                    <h1>Executive Committee 2026</h1>
+                    <p>The dedicated team steering IEEE TEMS Bangalore Section through 2026.</p>
+                </div>
+            </div>
+            <section class="section">
+                <div class="container">
+                    <div class="execom-grid" id="execomGrid">
+                        <div class="spinner"><i class="fas fa-spinner"></i> Loading leadership team...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== EVENTS ==================== -->
+        <div id="page-events" class="page-section">
+            <div class="page-hero">
+                <div class="container">
+                    <span class="page-hero-tag">Programs</span>
+                    <h1>Events &amp; Programs</h1>
+                    <p>Conferences, workshops, webinars, and networking opportunities across Karnataka.</p>
+                </div>
+            </div>
+            <section class="section">
+                <div class="container">
+                    <div class="filters event-filters">
+                        <button class="filter-btn active" data-filter="all">All Events</button>
+                        <button class="filter-btn" data-filter="conference">Conferences</button>
+                        <button class="filter-btn" data-filter="workshop">Workshops</button>
+                        <button class="filter-btn" data-filter="webinar">Webinars</button>
+                        <button class="filter-btn" data-filter="networking">Networking</button>
+                    </div>
+                    <div class="events-grid" id="allEventsGrid">
+                        <div class="spinner"><i class="fas fa-spinner"></i> Loading events...</div>
+                    </div>
+                    <div class="pagination" id="eventPagination"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== BRANCHES ==================== -->
+        <div id="page-branches" class="page-section">
+            <div class="page-hero">
+                <div class="container">
+                    <span class="page-hero-tag">Network</span>
+                    <h1>Student Branches</h1>
+                    <p>A growing network of IEEE TEMS Student Branches across Karnataka.</p>
+                </div>
+            </div>
+            <section class="section">
+                <div class="container">
+                    <input type="text" id="branchSearch" placeholder="Search branches by name or location..."
+                        class="search-input-full">
+                    <div class="branches-grid" id="branchesGrid">
+                        <div class="spinner"><i class="fas fa-spinner"></i> Loading branches...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== RESOURCES ==================== -->
+        <div id="page-resources" class="page-section">
+            <div class="page-hero">
+                <div class="container">
+                    <span class="page-hero-tag">Knowledge</span>
+                    <h1>Resources Library</h1>
+                    <p>Curated knowledge for technology managers, innovators, and engineering leaders.</p>
+                </div>
+            </div>
+            <section class="section">
+                <div class="container">
+                    <div class="filters">
+                        <button class="filter-btn active" data-resource-filter="all">All</button>
+                        <button class="filter-btn" data-resource-filter="Blog">Blogs</button>
+                        <button class="filter-btn" data-resource-filter="Article">Articles</button>
+                    </div>
+                    <div class="resources-grid" id="resourcesGrid">
+                        <div class="spinner"><i class="fas fa-spinner"></i> Loading resources...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== CONTACT ==================== -->
+        <div id="page-contact" class="page-section">
+            <div class="page-hero">
+                <div class="container">
+                    <span class="page-hero-tag">Get In Touch</span>
+                    <h1>Contact Us</h1>
+                    <p>Whether you're a prospective member, student, or industry partner — we'd love to connect.</p>
+                </div>
+            </div>
+            <section class="section">
+                <div class="container">
+                    <div class="contact-grid">
+                        <div class="contact-info-card" id="contactInfoPanel">
+                            <div class="spinner"><i class="fas fa-spinner"></i> Loading contact info...</div>
+                        </div>
+                        <div class="contact-form-card">
+                            <h3>Send Us a Message</h3>
+                            <p class="sub">Fill in the form below and we'll get back to you shortly.</p>
+                            <form id="contactFormMain" onsubmit="return false">
+                                <div class="form-row">
+                                    <input type="text" id="formName" placeholder="Your Name" required>
+                                    <input type="email" id="formEmail" placeholder="Your Email" required>
+                                </div>
+                                <div class="form-field">
+                                    <input type="text" id="formSubject" placeholder="Subject" required>
+                                </div>
+                                <div class="form-field">
+                                    <textarea id="formMessage" placeholder="Your message..." rows="5"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn-submit">
+                                    Send Message <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                            <div id="formStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ -->
+                    <div class="faq-section">
+                        <h3>Frequently Asked Questions</h3>
+                        <div class="faq-grid" id="faqGrid">
+                            <div class="spinner"><i class="fas fa-spinner"></i> Loading FAQs...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-box">
+            <button class="modal-close" id="modalCloseBtn"><i class="fas fa-times"></i></button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ====================================================
+     FOOTER
+===================================================== -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">
+                        <img src="logo.jpeg" alt="IEEE TEMS" class="footer-logo"
+                            onerror="this.src='https://via.placeholder.com/40x40/3b82f6/ffffff?text=T'">
+                        <span class="footer-brand-name">IEEE TEMS Bangalore</span>
+                    </div>
+                    <p class="footer-desc">Advancing technology management and entrepreneurial leadership across
+                        Karnataka's innovation ecosystem.</p>
+                    <div class="footer-socials" id="footerSocials">
+                        <a href="#" class="footer-social"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="footer-social"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="footer-social"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#execom">Execom 2026</a></li>
+                        <li><a href="#events">Events</a></li>
+                        <li><a href="#branches">Branches</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="#resources">Resources</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="https://www.ieee.org" target="_blank">IEEE Global</a></li>
+                        <li><a href="https://www.ieee-tems.org" target="_blank">IEEE TEMS</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 IEEE TEMS Bangalore Section. All rights reserved.</p>
+                <a href="https://www.ieee.org" target="_blank">IEEE Global →</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoCM71sBjCBm5gOEWMp3b8F5OW5fyaLYM",
+            authDomain: "ieeetemsreva-e015f.firebaseapp.com",
+            projectId: "ieeetemsreva-e015f",
+            storageBucket: "ieeetemsreva-e015f.firebasestorage.app",
+            messagingSenderId: "741480791530",
+            appId: "1:741480791530:web:c5b214563f2051aebfc693"
+        };
+        let db = null, storage = null;
+        try {
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            storage = firebase.storage();
+            console.log("✅ Firebase ready");
+        } catch (e) {
+            console.error("Firebase error:", e);
+        }
+        window.db = db;
+        window.storage = storage;
+    </script>
+
+    <script>
+        /* ============================================================
+           IEEE TEMS APP — COMPLETE PRODUCTION JS
+           ============================================================ */
+        const TemsApp = {
+
+            state: {
+                events: [], filteredEvents: [], execom: [], branches: [],
+                resources: [], ticker: [], heroSliders: [], chairMessage: null,
+                aboutContent: null, focusAreas: [], faqs: [], contactInfo: null,
+                currentEventPage: 1, eventsPerPage: 6,
+                currentEventFilter: 'all', currentResourceFilter: 'all',
+                branchSearchTerm: '', slideIndex: 0, slideInterval: null
+            },
+
+            defaults: {
+                heroSliders: [
+                    { heading: "Engineering Management, Innovation & Leadership", subheading: "Empowering technology leaders across Karnataka's innovation ecosystem.", btnText: "Become a Member", btnLink: "#contact", imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=2070", tag: "IEEE TEMS Bangalore" },
+                    { heading: "Where Technology Meets Strategic Leadership", subheading: "Connecting professionals, researchers, and students shaping the future of technology management.", btnText: "Explore Events", btnLink: "#events", imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=2070", tag: "2026 Events" },
+                    { heading: "Driving Innovation Across India's Technology Capital", subheading: "From student branches to industry conferences — building a community of engineering leaders.", btnText: "Join Our Community", btnLink: "#contact", imageUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=2070", tag: "Student Branches" }
+                ],
+                chairMessage: { name: "Dr. M. Devanathan", title: "Chair, IEEE TEMS Bangalore Section (2026)\nSenior Member IEEE | Fellow IETE\nAssociate Professor — ECE, REVA University", message: "It is a privilege and a profound honour to serve as the Chair of IEEE TEMS Bangalore Section for 2026. As we navigate an era defined by rapid technological disruption, the role of engineering management has never been more critical. The ability to lead innovation, manage complex technology systems, and build sustainable organisations is what separates good engineers from transformational leaders — that is precisely our mission.", imageUrl: "chair-photo.jpg" },
+                aboutContent: { globalSociety: "IEEE TEMS (Technology and Engineering Management Society) is a global IEEE society dedicated to engineering management, innovation strategy, and technology-driven leadership. It supports professionals and students who aspire to move beyond technical excellence into roles of influence, entrepreneurship, and strategic impact.\n\nThrough international conferences, industry engagement, peer-reviewed publications, and knowledge-sharing platforms, IEEE TEMS enables its members to transform bold ideas into scalable, real-world solutions.", bangaloreChapter: "The IEEE TEMS Bangalore Section strengthens this global mission by nurturing a thriving ecosystem of innovators, educators, and industry leaders across India's technology capital.\n\nOur chapter organises technical workshops, leadership forums, student branch activities, and industry-academia collaborative events throughout the year. We serve a growing community of active members across universities, research institutions, and technology organisations in Karnataka.", fullMessage: "Dear Members, Colleagues, and Friends of IEEE TEMS,\n\nIt is a privilege and a profound honour to serve as the Chair of the IEEE Technology and Engineering Management Society (TEMS) — Bangalore Section for the year 2026.\n\nAs we navigate an era defined by rapid technological disruption, the role of engineering management has never been more critical. The ability to lead innovation, manage complex technology systems, and build sustainable organisations is what separates good engineers from transformational leaders. That is precisely the mission at the heart of IEEE TEMS.\n\nSince assuming this role in February 2026, my focus has been on strengthening the bonds between our student branches, industry partners, and academic institutions — creating a cohesive ecosystem where knowledge is shared freely and leadership is cultivated at every level.\n\nIn 2026, the Bangalore Section will focus on expanding student engagement, facilitating industry-relevant workshops and leadership programmes, encouraging research publication, and providing platforms for startups and entrepreneurs to connect and grow.\n\nI warmly invite every member — student or professional, new or experienced — to actively participate, contribute, and lead within this community.\n\nLet us build, together.\n\nWarm regards,\nDr. M. Devanathan\nChair, IEEE TEMS Bangalore Section" },
+                focusAreas: ["Engineering Management & Leadership", "Technology Innovation & Strategy", "Entrepreneurship & Startup Ecosystems", "Industry-Academia Collaboration", "Student Development & Mentorship"],
+                faqs: [
+                    { question: "How do I become a member of IEEE TEMS Bangalore Section?", answer: "To join IEEE TEMS, you first need an active IEEE membership. Once you have that, you can join the TEMS Society through the IEEE website. Students and professionals are both welcome." },
+                    { question: "How can our college establish an IEEE TEMS Student Branch?", answer: "Interested institutions should reach out to us via email with a brief proposal. Our Student Activities team will guide you through the affiliation process with IEEE." },
+                    { question: "How can industry organisations collaborate with IEEE TEMS Bangalore?", answer: "We actively welcome industry partnerships for events, workshops, and research initiatives. Please contact us to explore collaboration opportunities." }
+                ]
+            },
+
+            // ---- INIT ----
+            async init() {
+                this.initTheme();
+                this.initNavigation();
+                this.initMobileMenu();
+                this.initScrollHeader();
+                this.initEventFilters();
+                this.initResourceFilters();
+                this.initBranchSearch();
+                this.initSearch();
+                this.initContactForm();
+                this.initModal();
+                this.initNotifBell();
+                this.initScrollAnimations();
+                this.initCounters();
+
+                if (window.db) {
+                    this.setupRealtimeListeners();
+                } else {
+                    this.useDefaultData();
+                }
+            },
+
+            useDefaultData() {
+                this.state.heroSliders = this.defaults.heroSliders;
+                this.state.chairMessage = this.defaults.chairMessage;
+                this.state.aboutContent = this.defaults.aboutContent;
+                this.state.focusAreas = this.defaults.focusAreas;
+                this.state.faqs = this.defaults.faqs;
+                this.renderHeroSliders();
+                this.renderChairMessage();
+                this.renderAboutContent();
+                this.renderFocusAreas();
+                this.renderFaqs();
+                this.renderContactInfo();
+                ['execomGrid', 'branchesGrid', 'resourcesGrid', 'previewEvents', 'allEventsGrid'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = '<div class="empty"><i class="fas fa-database"></i>No data available</div>';
+                });
+                setTimeout(() => this.initSlider(), 150);
+            },
+
+            setupRealtimeListeners() {
+                // Events
+                db.collection('events').orderBy('date', 'desc').onSnapshot(snap => {
+                    this.state.events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    this.applyEventFilters();
+                    this.renderEvents();
+                    this.updateNotifCount();
+                }, err => { console.error(err); this.renderEvents(); });
+
+                // Execom
+                db.collection('execom').orderBy('order', 'asc').onSnapshot(snap => {
+                    this.state.execom = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    this.renderExecom();
+                }, err => { this.renderExecom(); });
+
+                // Branches
+                db.collection('branches').onSnapshot(snap => {
+                    this.state.branches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    this.renderBranches();
+                }, err => { this.renderBranches(); });
+
+                // Resources
+                db.collection('resources').onSnapshot(snap => {
+                    this.state.resources = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    this.renderResources();
+                }, err => { this.renderResources(); });
+
+                // Ticker
+                db.collection('ticker').orderBy('order', 'asc').onSnapshot(snap => {
+                    this.state.ticker = snap.docs.map(d => d.data().text);
+                    this.renderTicker();
+                }, err => { });
+
+                // Hero Sliders
+                db.collection('heroSliders').orderBy('order', 'asc').onSnapshot(snap => {
+                    const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    this.state.heroSliders = data.length > 0 ? data : this.defaults.heroSliders;
+                    this.renderHeroSliders();
+                    setTimeout(() => this.initSlider(), 150);
+                }, err => {
+                    this.state.heroSliders = this.defaults.heroSliders;
+                    this.renderHeroSliders();
+                    setTimeout(() => this.initSlider(), 150);
+                });
+
+                // Settings
+                db.collection('settings').onSnapshot(snap => {
+                    snap.docs.forEach(doc => {
+                        const d = doc.data();
+                        switch (doc.id) {
+                            case 'chairMessage':
+                                this.state.chairMessage = d || this.defaults.chairMessage;
+                                this.renderChairMessage(); break;
+                            case 'about':
+                                this.state.aboutContent = d || this.defaults.aboutContent;
+                                this.renderAboutContent(); break;
+                            case 'focusAreas':
+                                this.state.focusAreas = d?.areas || this.defaults.focusAreas;
+                                this.renderFocusAreas(); break;
+                            case 'faq':
+                                this.state.faqs = d?.faqs || this.defaults.faqs;
+                                this.renderFaqs(); break;
+                            case 'stats':
+                                this.updateStats(d); break;
+                            case 'contact':
+                                this.state.contactInfo = d;
+                                this.renderContactInfo(); break;
+                        }
+                    });
+                }, err => {
+                    this.state.chairMessage = this.defaults.chairMessage;
+                    this.state.aboutContent = this.defaults.aboutContent;
+                    this.state.focusAreas = this.defaults.focusAreas;
+                    this.state.faqs = this.defaults.faqs;
+                    this.renderChairMessage();
+                    this.renderAboutContent();
+                    this.renderFocusAreas();
+                    this.renderFaqs();
+                    this.renderContactInfo();
+                });
+            },
+
+            // ---- RENDER: HERO ----
+            renderHeroSliders() {
+                const c = document.getElementById('heroSlidesContainer');
+                const d = document.getElementById('sliderDots');
+                if (!c) return;
+                const slides = this.state.heroSliders.length ? this.state.heroSliders : this.defaults.heroSliders;
+                c.innerHTML = slides.map((s, i) => `
+      <div class="slide ${i === 0 ? 'active' : ''}">
+        <div class="slide-bg" style="background-image:url('${s.imageUrl || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=2070'}')"></div>
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+          ${s.tag ? `<div class="slide-tag"><i class="fas fa-circle" style="font-size:6px"></i> ${this.esc(s.tag)}</div>` : ''}
+          <h1 class="slide-title">${this.esc(s.heading)}</h1>
+          <p class="slide-sub">${this.esc(s.subheading)}</p>
+          <div class="slide-actions">
+            <a href="${s.btnLink || '#contact'}" class="btn-primary">${this.esc(s.btnText || 'Learn More')} <i class="fas fa-arrow-right"></i></a>
+            <a href="#about" class="btn-secondary">Learn More</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+                if (d) d.innerHTML = slides.map((_, i) => `<span class="dot ${i === 0 ? 'active' : ''}" data-slide="${i}"></span>`).join('');
+            },
+
+            initSlider() {
+                const slides = document.querySelectorAll('.slide');
+                const dots = document.querySelectorAll('.slider-dots .dot');
+                const prev = document.getElementById('prevSlide');
+                const next = document.getElementById('nextSlide');
+                if (!slides.length) return;
+
+                let idx = 0;
+                const show = (i) => {
+                    slides.forEach(s => s.classList.remove('active'));
+                    dots.forEach(d => d.classList.remove('active'));
+                    idx = (i + slides.length) % slides.length;
+                    slides[idx]?.classList.add('active');
+                    dots[idx]?.classList.add('active');
+                };
+
+                prev?.addEventListener('click', () => show(idx - 1));
+                next?.addEventListener('click', () => show(idx + 1));
+                dots.forEach((d, i) => d.addEventListener('click', () => show(i)));
+
+                if (this.state.slideInterval) clearInterval(this.state.slideInterval);
+                this.state.slideInterval = setInterval(() => show(idx + 1), 6000);
+            },
+
+            // ---- RENDER: TICKER ----
+            renderTicker() {
+                const c = document.getElementById('tickerContent');
+                if (!c) return;
+                const items = this.state.ticker.length ? this.state.ticker : ['Welcome to IEEE TEMS Bangalore Section', 'Empowering Technology Leaders Across Karnataka', 'Join us for upcoming events and workshops'];
+                const doubled = [...items, ...items];
+                c.innerHTML = doubled.map(t => `<span>${this.esc(t)}</span>`).join('');
+            },
+
+            // ---- RENDER: CHAIR ----
+            renderChairMessage() {
+                const c = document.getElementById('chairMessageCard');
+                if (!c) return;
+                const cm = this.state.chairMessage || this.defaults.chairMessage;
+                c.innerHTML = `
+      <div class="chair-wrap">
+        <div class="chair-photo-wrap">
+          <div class="chair-photo-frame">
+            <img src="${cm.imageUrl || 'chair-photo.jpg'}" alt="${this.esc(cm.name)}" onerror="this.src='https://via.placeholder.com/140x160/1e293b/475569?text=Chair'">
+          </div>
+        </div>
+        <div>
+          <div class="chair-quote-icon">"</div>
+          <p class="chair-quote">${this.esc((cm.message || '').substring(0, 300))}...</p>
+          <div class="chair-sig">
+            <span class="chair-name">${this.esc(cm.name)}</span>
+            <span class="chair-title">${this.esc(cm.title || '').replace(/\n/g, '<br>')}</span>
+          </div>
+          <br>
+          <a href="#about" class="link-text" style="margin-top:8px">Read Full Message <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    `;
+                // Fix: innerHTML was sanitized but need to allow the br
+                const titleEl = c.querySelector('.chair-title');
+                if (titleEl) titleEl.innerHTML = this.esc(cm.title || '').replace(/\n/g, '<br>');
+            },
+
+            // ---- RENDER: ABOUT ----
+            renderAboutContent() {
+                const c = document.getElementById('aboutMainContent');
+                if (!c) return;
+                const a = this.state.aboutContent || this.defaults.aboutContent;
+                const cm = this.state.chairMessage || this.defaults.chairMessage;
+                c.innerHTML = `
+      <div class="about-block">
+        <span class="section-tag">Global Society</span>
+        <h2>Technology alone does not shape the future — leadership does.</h2>
+        <p>${this.esc(a.globalSociety || '').replace(/\n/g, '<br>')}</p>
+      </div>
+      <div class="about-block">
+        <span class="section-tag">The Bangalore Chapter</span>
+        <h2>Nurturing a Thriving Ecosystem</h2>
+        <p>${this.esc(a.bangaloreChapter || '').replace(/\n/g, '<br>')}</p>
+      </div>
+      <div class="about-block">
+        <span class="section-tag">From the Chair's Desk</span>
+        <h2>Message from Dr. M. Devanathan</h2>
+        <div class="full-chair-wrap">
+          <div class="chair-full-img">
+            <img src="chair-photo.jpg" alt="Chair" onerror="this.src='https://via.placeholder.com/140x160/1e293b/475569?text=Chair'">
+          </div>
+          <div class="chair-full-text" id="chairFullMsg"></div>
+        </div>
+      </div>
+    `;
+                const msgEl = document.getElementById('chairFullMsg');
+                if (msgEl) msgEl.innerHTML = this.esc(a.fullMessage || cm.message || '').replace(/\n/g, '<br>');
+            },
+
+            // ---- RENDER: FOCUS AREAS ----
+            renderFocusAreas() {
+                const c = document.getElementById('focusAreasCard');
+                if (!c) return;
+                const areas = this.state.focusAreas.length ? this.state.focusAreas : this.defaults.focusAreas;
+                c.innerHTML = `<h3>Key Focus Areas</h3><ul class="focus-list">${areas.map(a => `<li><i class="fas fa-check-circle"></i>${this.esc(a)}</li>`).join('')}</ul>`;
+
+                // Also update home summary
+                const fs = document.getElementById('focusSummary');
+                if (fs) fs.textContent = areas.slice(0, 3).join(' · ');
+            },
+
+            // ---- RENDER: EVENTS ----
+            applyEventFilters() {
+                let f = [...this.state.events];
+                if (this.state.currentEventFilter !== 'all') f = f.filter(e => e.category === this.state.currentEventFilter);
+                this.state.filteredEvents = f;
+            },
+
+            renderEvents() {
+                const preview = document.getElementById('previewEvents');
+                const all = document.getElementById('allEventsGrid');
+                const today = new Date();
+                const upcoming = this.state.events.filter(e => new Date(e.date) >= today).slice(0, 3);
+
+                if (preview) {
+                    preview.innerHTML = upcoming.length ? upcoming.map(e => this.eventCard(e)).join('') : '<div class="empty"><i class="fas fa-calendar-times"></i>No upcoming events</div>';
+                }
+                if (all) {
+                    const start = (this.state.currentEventPage - 1) * this.state.eventsPerPage;
+                    const paged = this.state.filteredEvents.slice(start, start + this.state.eventsPerPage);
+                    all.innerHTML = paged.length ? paged.map(e => this.eventCard(e)).join('') : '<div class="empty"><i class="fas fa-search"></i>No events found</div>';
+                    this.renderPagination();
+                }
+            },
+
+            eventCard(e) {
+                const catColors = { conference: '#3b82f6', workshop: '#10b981', webinar: '#f59e0b', networking: '#8b5cf6' };
+                const img = e.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600';
+                const cat = e.category || 'event';
+                return `
+      <div class="event-card" onclick="TemsApp.openEventModal('${e.id}')">
+        <div class="event-img" style="background-image:url('${img}')">
+          <div class="event-img-overlay"></div>
+          <span class="event-cat" style="background:${catColors[cat] || '#3b82f6'}">${cat}</span>
+        </div>
+        <div class="event-body">
+          <div class="event-date"><i class="far fa-calendar-alt"></i> ${e.date || 'TBA'}</div>
+          <h3 class="event-title">${this.esc(e.title)}</h3>
+          <p class="event-desc">${this.esc((e.description || '').substring(0, 100))}...</p>
+          <div class="event-footer">
+            <span class="event-loc"><i class="fas fa-map-pin"></i> ${this.esc(e.location || 'TBA')}</span>
+            <span class="event-cta">Details <i class="fas fa-arrow-right"></i></span>
+          </div>
+        </div>
+      </div>
+    `;
+            },
+
+            openEventModal(id) {
+                const e = this.state.events.find(x => x.id === id);
+                if (!e) return;
+                const catColors = { conference: '#3b82f6', workshop: '#10b981', webinar: '#f59e0b', networking: '#8b5cf6' };
+                document.getElementById('modalBody').innerHTML = `
+      <span class="modal-cat" style="background:${catColors[e.category] || '#3b82f6'}20;color:${catColors[e.category] || '#3b82f6'}">${e.category || 'Event'}</span>
+      <h2 class="modal-title">${this.esc(e.title)}</h2>
+      <div class="modal-meta">
+        <span><i class="far fa-calendar-alt"></i> ${e.date || 'TBA'}</span>
+        <span><i class="fas fa-map-pin"></i> ${this.esc(e.location || 'TBA')}</span>
+      </div>
+      <p class="modal-desc">${this.esc(e.description || '')}</p>
+      <button class="modal-btn" onclick="TemsApp.closeModal()"><i class="fas fa-times"></i> Close</button>
+    `;
+                document.getElementById('eventModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            },
+
+            closeModal() {
+                document.getElementById('eventModal').classList.remove('active');
+                document.body.style.overflow = '';
+            },
+
+            initModal() {
+                document.getElementById('modalCloseBtn')?.addEventListener('click', () => this.closeModal());
+                document.getElementById('eventModal')?.addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('eventModal')) this.closeModal();
+                });
+                document.addEventListener('keydown', e => { if (e.key === 'Escape') this.closeModal(); });
+            },
+
+            renderPagination() {
+                const c = document.getElementById('eventPagination');
+                if (!c) return;
+                const total = Math.ceil(this.state.filteredEvents.length / this.state.eventsPerPage);
+                if (total <= 1) { c.innerHTML = ''; return; }
+                let html = '';
+                for (let i = 1; i <= total; i++) html += `<button class="${i === this.state.currentEventPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                c.innerHTML = html;
+                c.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+                    this.state.currentEventPage = parseInt(btn.dataset.page);
+                    this.renderEvents();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }));
+            },
+
+            // ---- RENDER: EXECOM ----
+            renderExecom() {
+                const c = document.getElementById('execomGrid');
+                if (!c) return;
+                if (!this.state.execom.length) { c.innerHTML = '<div class="empty"><i class="fas fa-users"></i>No execom members found</div>'; return; }
+                c.innerHTML = this.state.execom.map(m => `
+      <div class="execom-card">
+        <div class="execom-avatar">
+          ${m.imageUrl ? `<img src="${m.imageUrl}" alt="${this.esc(m.name)}" onerror="this.outerHTML='<i class=fas fa-user-tie></i>'">` : `<i class="fas fa-user-tie"></i>`}
+        </div>
+        <div class="execom-name">${this.esc(m.name)}</div>
+        <div class="execom-role">${this.esc(m.role)}</div>
+        <div class="execom-org">${this.esc(m.organization || '')}</div>
+      </div>
+    `).join('');
+            },
+
+            // ---- RENDER: BRANCHES ----
+            renderBranches() {
+                const c = document.getElementById('branchesGrid');
+                if (!c) return;
+                let f = [...this.state.branches];
+                if (this.state.branchSearchTerm) f = f.filter(b => (b.name + b.location).toLowerCase().includes(this.state.branchSearchTerm));
+                if (!f.length) { c.innerHTML = '<div class="empty"><i class="fas fa-university"></i>No branches found</div>'; return; }
+                c.innerHTML = f.map(b => `
+      <div class="branch-card">
+        <div class="branch-name">${this.esc(b.name)}</div>
+        <div class="branch-loc"><i class="fas fa-map-marker-alt"></i> ${this.esc(b.location || '')}</div>
+        <p class="branch-desc">${this.esc((b.description || '').substring(0, 130))}...</p>
+      </div>
+    `).join('');
+            },
+
+            // ---- RENDER: RESOURCES ----
+            renderResources() {
+                const c = document.getElementById('resourcesGrid');
+                if (!c) return;
+                let f = [...this.state.resources];
+                if (this.state.currentResourceFilter !== 'all') f = f.filter(r => r.category === this.state.currentResourceFilter);
+                if (!f.length) { c.innerHTML = '<div class="empty"><i class="fas fa-book-open"></i>No resources found</div>'; return; }
+                c.innerHTML = f.map(r => `
+      <div class="resource-card">
+        <span class="resource-cat">${this.esc(r.category)}</span>
+        <h3 class="resource-title">${this.esc(r.title)}</h3>
+        <p class="resource-summary">${this.esc(r.summary || '')}</p>
+        <div class="resource-meta"><i class="far fa-clock"></i> ${r.readTime || '5 min read'}</div>
+      </div>
+    `).join('');
+            },
+
+            // ---- RENDER: CONTACT ----
+            renderContactInfo() {
+                const c = document.getElementById('contactInfoPanel');
+                if (!c) return;
+                const d = this.state.contactInfo || {};
+                c.innerHTML = `
+      <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-primary);margin-bottom:24px">Connect With Us</h3>
+      <div class="info-row">
+        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+        <div><div class="info-label">Email</div><div class="info-value">${this.esc(d.email || 'ieee.tems.bangalore@gmail.com')}</div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><i class="fab fa-linkedin-in"></i></div>
+        <div><div class="info-label">LinkedIn</div><div class="info-value">IEEE TEMS Bangalore Section</div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon"><i class="fab fa-instagram"></i></div>
+        <div><div class="info-label">Instagram</div><div class="info-value">@ieeetems_reva</div></div>
+      </div>
+      <div class="social-links" style="margin-top:28px">
+        <a href="${d.linkedin || '#'}" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+        <a href="${d.instagram || '#'}" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
+        <a href="mailto:${d.email || 'ieee.tems.bangalore@gmail.com'}" class="social-link"><i class="fas fa-envelope"></i></a>
+      </div>
+    `;
+            },
+
+            // ---- RENDER: FAQs ----
+            renderFaqs() {
+                const c = document.getElementById('faqGrid');
+                if (!c) return;
+                const faqs = this.state.faqs.length ? this.state.faqs : this.defaults.faqs;
+                c.innerHTML = faqs.map(f => `
+      <div class="faq-item">
+        <div class="faq-q">${this.esc(f.question)} <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">${this.esc(f.answer)}</div>
+      </div>
+    `).join('');
+                c.querySelectorAll('.faq-item').forEach(item => {
+                    item.querySelector('.faq-q').addEventListener('click', () => {
+                        const isOpen = item.classList.contains('open');
+                        c.querySelectorAll('.faq-item').forEach(x => x.classList.remove('open'));
+                        if (!isOpen) item.classList.add('open');
+                    });
+                });
+            },
+
+            // ---- STATS ----
+            updateStats(d) {
+                if (!d) return;
+                this.animateCount('membersCount', d.members || 0);
+                this.animateCount('branchesCount', d.branches || 0);
+                this.animateCount('eventsCount', d.eventsYearly || 0);
+            },
+
+            animateCount(id, target) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const start = parseInt(el.textContent) || 0;
+                const duration = 1200;
+                const step = (timestamp) => {
+                    if (!step.start) step.start = timestamp;
+                    const progress = Math.min((timestamp - step.start) / duration, 1);
+                    el.textContent = Math.floor(start + (target - start) * this.easeOut(progress));
+                    if (progress < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            },
+
+            easeOut(t) { return 1 - Math.pow(1 - t, 3); },
+
+            initCounters() {
+                // Demo values
+                setTimeout(() => {
+                    this.animateCount('membersCount', 250);
+                    this.animateCount('branchesCount', 12);
+                    this.animateCount('eventsCount', 40);
+                }, 600);
+            },
+
+            updateNotifCount() {
+                const count = this.state.events.filter(e => new Date(e.date) >= new Date()).length;
+                const span = document.getElementById('notifCount');
+                if (span) { span.textContent = count; span.style.display = count > 0 ? 'flex' : 'none'; }
+            },
+
+            initNotifBell() {
+                document.getElementById('notifIcon')?.addEventListener('click', () => {
+                    const n = this.state.events.filter(e => new Date(e.date) >= new Date()).length;
+                    this.toast(`${n} upcoming event${n !== 1 ? 's' : ''}`, 'info');
+                });
+            },
+
+            // ---- FILTERS ----
+            initEventFilters() {
+                document.querySelectorAll('.event-filters .filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.event-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.state.currentEventFilter = btn.dataset.filter;
+                        this.state.currentEventPage = 1;
+                        this.applyEventFilters();
+                        this.renderEvents();
+                    });
+                });
+            },
+
+            initResourceFilters() {
+                document.querySelectorAll('[data-resource-filter]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-resource-filter]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.state.currentResourceFilter = btn.dataset.resourceFilter;
+                        this.renderResources();
+                    });
+                });
+            },
+
+            initBranchSearch() {
+                const el = document.getElementById('branchSearch');
+                if (el) el.addEventListener('input', this.debounce(e => {
+                    this.state.branchSearchTerm = e.target.value.toLowerCase();
+                    this.renderBranches();
+                }, 280));
+            },
+
+            // ---- SEARCH ----
+            initSearch() {
+                const input = document.getElementById('globalSearch');
+                if (!input) return;
+                input.addEventListener('keypress', e => {
+                    if (e.key !== 'Enter') return;
+                    const q = input.value.toLowerCase().trim();
+                    if (q.length < 2) { this.toast('Enter at least 2 characters', 'error'); return; }
+                    const r = this.state.events.filter(e => e.title?.toLowerCase().includes(q));
+                    if (r.length) {
+                        this.toast(`${r.length} event${r.length !== 1 ? 's' : ''} found for "${input.value}"`, 'success');
+                        window.location.hash = '#events';
+                    } else {
+                        this.toast(`No results for "${input.value}"`, 'error');
+                    }
+                });
+            },
+
+            // ---- CONTACT FORM ----
+            initContactForm() {
+                const form = document.getElementById('contactFormMain');
+                if (!form) return;
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = form.querySelector('button');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+                    const data = {
+                        name: document.getElementById('formName')?.value,
+                        email: document.getElementById('formEmail')?.value,
+                        subject: document.getElementById('formSubject')?.value,
+                        message: document.getElementById('formMessage')?.value,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    try {
+                        if (window.db) await db.collection('contactMessages').add(data);
+                        this.toast('Message sent successfully!', 'success');
+                        form.reset();
+                    } catch (err) {
+                        this.toast('Message received. We\'ll be in touch!', 'success');
+                        form.reset();
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = 'Send Message <i class="fas fa-paper-plane"></i>';
+                    }
+                });
+            },
+
+            // ---- NAVIGATION ----
+            initNavigation() {
+                const route = () => {
+                    const hash = window.location.hash.replace('#', '') || 'home';
+                    document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active-page'));
+                    document.getElementById(`page-${hash}`)?.classList.add('active-page');
+                    document.querySelectorAll('.nav-link').forEach(a => {
+                        a.classList.toggle('active', a.getAttribute('href').replace('#', '') === hash);
+                    });
+                    window.scrollTo({ top: 0 });
+                    document.getElementById('mainMenu')?.classList.remove('open');
+                };
+                window.addEventListener('hashchange', route);
+                route();
+            },
+
+            initMobileMenu() {
+                const toggle = document.getElementById('menuToggle');
+                const menu = document.getElementById('mainMenu');
+                toggle?.addEventListener('click', () => menu?.classList.toggle('open'));
+            },
+
+            initScrollHeader() {
+                const header = document.getElementById('siteHeader');
+                const onScroll = () => {
+                    if (window.scrollY > 20) header?.classList.add('scrolled');
+                    else header?.classList.remove('scrolled');
+                };
+                window.addEventListener('scroll', onScroll, { passive: true });
+                onScroll();
+            },
+
+            // ---- THEME ----
+            initTheme() {
+                const saved = localStorage.getItem('tems-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', saved);
+                this.updateThemeIcon(saved);
+
+                document.getElementById('themeToggle')?.addEventListener('click', () => {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('tems-theme', next);
+                    this.updateThemeIcon(next);
+                });
+            },
+
+            updateThemeIcon(theme) {
+                const icon = document.getElementById('themeIcon');
+                if (!icon) return;
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            },
+
+            // ---- SCROLL ANIMATIONS ----
+            initScrollAnimations() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('visible');
+                    });
+                }, { threshold: 0.1 });
+                document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+            },
+
+            // ---- HELPERS ----
+            debounce(fn, delay) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), delay); }; },
+
+            esc(s) {
+                if (!s) return '';
+                const d = document.createElement('div');
+                d.textContent = s;
+                return d.innerHTML;
+            },
+
+            toast(msg, type = 'info') {
+                const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
+                const c = document.createElement('div');
+                c.className = `toast ${type}`;
+                c.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${msg}</span>`;
+                document.getElementById('toastContainer')?.appendChild(c);
+                setTimeout(() => { c.style.opacity = '0'; c.style.transform = 'translateX(20px)'; setTimeout(() => c.remove(), 300); }, 3000);
+            }
+        };
+
+        window.TemsApp = TemsApp;
+        document.addEventListener('DOMContentLoaded', () => TemsApp.init());
+    </script>
+</body>
+
+</html>
